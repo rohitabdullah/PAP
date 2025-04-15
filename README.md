@@ -2,7 +2,7 @@
 
 A simple and engaging project to **educate users about phishing** through interactive quizzes, URL checks, and email verification. Designed with a sleek hacker theme and built using HTML and CSS.
 
-🔗 **Live Demo:** [Click Here](https://rohitabdullah.github.io/Phishing-Awareness-Portal/)
+🔗 **Live Demo:** [Click Here](https://rohitabdullah.github.io/PAP/).
 
 ---
 
