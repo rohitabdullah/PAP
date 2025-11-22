@@ -6,121 +6,108 @@
   <title>Phishing Awareness Quiz</title>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
-      margin: 0;
-      padding: 0;
-      background: black;
-      font-family: 'Poppins', sans-serif;
-      color: #fff;
-      overflow-x: hidden;
+      margin: 0; padding: 0; background: black;
+      font-family: 'Poppins', sans-serif; color: #fff; overflow-x: hidden;
     }
-
-    
-    canvas#matrix {
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: -1;
-    }
+    canvas#matrix { position: fixed; top: 0; left: 0; z-index: -1; }
 
     .quiz-container {
-      max-width: 900px;
-      margin: 4rem auto;
-      background-color: rgba(0, 0, 0, 0.7);
-      padding: 2rem;
-      border-radius: 15px;
+      max-width: 800px; margin: 4rem auto;
+      background-color: rgba(0, 0, 0, 0.85);
+      padding: 2rem; border-radius: 15px;
       box-shadow: 0 0 20px #00ff9c70;
+      border: 1px solid #00ff9c;
       animation: fadeIn 1s ease;
       z-index: 1;
     }
 
     h1 {
-      text-align: center;
-      color: #00ff9c;
-      font-family: 'Fira Code', monospace;
-      margin-bottom: 2rem;
+      text-align: center; color: #00ff9c;
+      font-family: 'Fira Code', monospace; margin-bottom: 1rem;
       text-shadow: 0 0 8px #00ff9c;
     }
 
-    .question {
-      margin-bottom: 2rem;
-      animation: slideUp 0.8s ease;
+    .set-badge {
+      text-align: center; background: #003320; color: #00ff9c;
+      padding: 0.5rem 1rem; border-radius: 20px;
+      display: inline-block; margin-bottom: 2rem;
+      border: 1px solid #00ff9c; font-family: 'Fira Code', monospace;
+      font-size: 0.9rem;
     }
 
-    .question h2 {
-      margin-bottom: 1rem;
-      color: #ffff00;
+    /* --- Question Styles --- */
+    .question {
+      margin-bottom: 1.5rem; padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px; border-left: 4px solid #00ff9c;
     }
+    .question h2 { margin-bottom: 1rem; color: #ffff00; font-size: 1.1rem; line-height: 1.5; }
 
     .options label {
-      display: block;
-      background: #111;
-      border: 1px solid #00ff9c;
-      padding: 1rem;
-      margin-bottom: 0.5rem;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s;
+      display: block; background: #111; border: 1px solid #333;
+      padding: 0.8rem; margin-bottom: 0.5rem; border-radius: 6px;
+      cursor: pointer; transition: 0.3s; font-size: 0.95rem;
+    }
+    .options label:hover { background: #00ff9c; color: #000; }
+
+    /* Feedback Colors */
+    .options label.correct { background-color: #28a745 !important; color: white !important; border-color: #28a745; }
+    .options label.wrong { background-color: #dc3545 !important; color: white !important; border-color: #dc3545; }
+
+    .explanation {
+      margin-top: 1rem; padding: 0.8rem; background: rgba(0, 0, 0, 0.6);
+      border-left: 3px solid #ffff00; font-size: 0.9rem; color: #ddd;
+      display: none;
     }
 
-    .options label:hover {
-      background: #00ff9c;
-      color: #000;
-      transform: scale(1.02);
-    }
-
+    /* --- Buttons --- */
     .submit-btn, .back-btn {
-      display: block;
-      margin: 2rem auto 0;
-      background: #00ff9c;
-      color: #000;
-      border: none;
-      padding: 1rem 2rem;
-      border-radius: 10px;
-      font-size: 1.2rem;
-      cursor: pointer;
-      box-shadow: 0 0 10px #00ff9c;
-      transition: 0.3s ease;
+      display: block; margin: 2rem auto 0; background: #00ff9c;
+      color: #000; border: none; padding: 1rem 2rem; border-radius: 8px;
+      font-size: 1.1rem; cursor: pointer; box-shadow: 0 0 10px #00ff9c;
+      transition: 0.3s ease; font-family: 'Fira Code', monospace; font-weight: bold;
+    }
+    .submit-btn:hover { transform: scale(1.05); background: #00cc7a; }
+    
+    .back-btn { background: transparent; color: #00ff9c; border: 1px solid #00ff9c; margin-top: 1rem; }
+    .back-btn:hover { background: #00ff9c; color: #000; }
+
+    /* --- Circular Progress Bar --- */
+    .result-container {
+      display: none; /* Hidden initially */
+      text-align: center; margin-top: 2rem;
+      animation: slideUp 0.5s ease;
+    }
+    
+    .progress-wrapper {
+      position: relative; width: 150px; height: 150px; margin: 0 auto;
+    }
+    
+    .progress-svg { transform: rotate(-90deg); width: 150px; height: 150px; }
+    
+    .progress-circle-bg { fill: none; stroke: #333; stroke-width: 10; }
+    
+    .progress-circle-fg {
+      fill: none; stroke: #00ff9c; stroke-width: 10;
+      stroke-dasharray: 440; /* Circumference */
+      stroke-dashoffset: 440; /* Start empty */
+      transition: stroke-dashoffset 1.5s ease-out;
+      stroke-linecap: round;
+    }
+
+    .progress-text {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.5rem; font-weight: bold; color: #fff;
       font-family: 'Fira Code', monospace;
     }
 
-    .submit-btn:hover, .back-btn:hover {
-      background: #00cc7a;
-    }
+    .score-text { margin-top: 1rem; font-size: 1.2rem; color: #ffff00; }
 
-    .back-btn {
-      margin-top: 1rem;
-      background: transparent;
-      color: #00ff9c;
-      border: 1px solid #00ff9c;
-    }
-
-    .back-btn:hover {
-      background: #00ff9c;
-      color: #000;
-    }
-
-    .result {
-      text-align: center;
-      font-size: 1.5rem;
-      margin-top: 2rem;
-      color: #00ff9c;
-      text-shadow: 0 0 5px #00ff9c;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes slideUp {
-      from { transform: translateY(40px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   </style>
 </head>
 <body>
@@ -129,186 +116,217 @@
 
   <div class="quiz-container">
     <h1>🛡️ Phishing Awareness Quiz</h1>
-    <form id="quizForm">
-      
-    </form>
-    <button class="submit-btn" onclick="submitQuiz()">Submit Answers</button>
-    <button class="back-btn" onclick="goBack()">⬅️ Back to Home</button>
-    <div class="result" id="result"></div>
+    <div style="text-align: center;">
+      <span class="set-badge" id="setInfo">Loading...</span>
+    </div>
+
+    <form id="quizForm"></form>
+    
+    <div class="result-container" id="resultSection">
+      <div class="progress-wrapper">
+        <svg class="progress-svg">
+          <circle class="progress-circle-bg" cx="75" cy="75" r="70"></circle>
+          <circle class="progress-circle-fg" id="progressFg" cx="75" cy="75" r="70"></circle>
+        </svg>
+        <div class="progress-text" id="percentageText">0%</div>
+      </div>
+      <div class="score-text" id="scoreText"></div>
+    </div>
+    
+    <button class="submit-btn" id="submitBtn" onclick="submitQuiz()">Submit Answers</button>
+    <button class="back-btn" onclick="window.location.href='index.html'">⬅️ Back to Home</button>
   </div>
 
-  
   <script>
     const canvas = document.getElementById('matrix');
     const ctx = canvas.getContext('2d');
-    canvas.height = window.innerHeight;
-    canvas.width = window.innerWidth;
-
-    const chars = "アァイィウヴエェオカガキギクグケゲコゴサザシジスズセゼソゾタダチッヂヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモヤユヨラリルレロワヲンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".split("");
-
-    const fontSize = 14;
-    const columns = canvas.width / fontSize;
-    const drops = new Array(Math.floor(columns)).fill(1);
-
-    function drawMatrix() {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = "#00ff9c";
-      ctx.font = `${fontSize}px monospace`;
-
-      for (let i = 0; i < drops.length; i++) {
-        const text = chars[Math.floor(Math.random() * chars.length)];
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-
+    function resize(){ canvas.height=window.innerHeight; canvas.width=window.innerWidth; }
+    window.addEventListener('resize', resize); resize();
+    const chars = "01"; const fontSize = 14;
+    let columns = canvas.width/fontSize; let drops=[];
+    function initMatrix(){ columns=canvas.width/fontSize; drops=new Array(Math.floor(columns)).fill(1); }
+    initMatrix();
+    function drawMatrix(){
+      ctx.fillStyle="rgba(0,0,0,0.05)"; ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle="#00ff9c"; ctx.font=`${fontSize}px monospace`;
+      for(let i=0; i<drops.length; i++){
+        ctx.fillText(chars[Math.floor(Math.random()*chars.length)], i*fontSize, drops[i]*fontSize);
+        if(drops[i]*fontSize>canvas.height && Math.random()>0.975) drops[i]=0;
         drops[i]++;
       }
     }
-
-    setInterval(drawMatrix, 40);
+    setInterval(drawMatrix, 50);
   </script>
 
-  
   <script>
-    const questions = [
-      {
-        q: "You receive an email from your bank asking to confirm your login info via a link. What do you do?",
-        options: [
-          "Click the link and enter info",
-          "Ignore it",
-          "Contact bank using official site",
-          "Forward it to a friend"
-        ],
-        answer: 2
-      },
-      {
-        q: "Which of these is a common sign of a phishing attempt?",
-        options: [
-          "Personalized greeting",
-          "Unusual sender address",
-          "Secure https link",
-          "Familiar company logo"
-        ],
-        answer: 1
-      },
-      {
-        q: "What is the safest way to verify a suspicious link?",
-        options: [
-          "Click it and see",
-          "Check hover preview",
-          "Ask in comments",
-          "Guess based on URL"
-        ],
-        answer: 1
-      },
-      {
-        q: "You get a message saying you won a prize and need to pay a fee to claim it. What's the best action?",
-        options: [
-          "Pay quickly",
-          "Reply with details",
-          "Ignore or report it",
-          "Try it for fun"
-        ],
-        answer: 2
-      },
-      {
-        q: "Which of the following is NOT recommended to prevent phishing?",
-        options: [
-          "Use multi-factor authentication",
-          "Ignore security updates",
-          "Verify URLs",
-          "Check email sender"
-        ],
-        answer: 1
-      },
-      {
-        q: "Why is it risky to reuse the same password?",
-        options: [
-          "Slower typing",
-          "Harder to remember",
-          "One breach = all accounts compromised",
-          "Sites require changes"
-        ],
-        answer: 2
-      },
-      {
-        q: "What should you do if you clicked a phishing link by mistake?",
-        options: [
-          "Nothing, it's fine",
-          "Tell friends",
-          "Change passwords, scan device",
-          "Buy antivirus"
-        ],
-        answer: 2
-      },
-      {
-        q: "An email urges urgent action and threatens account closure. You should:",
-        options: [
-          "Panic and act",
-          "Click fast",
-          "Verify via official contact",
-          "Reply to email"
-        ],
-        answer: 2
-      },
-      {
-        q: "Which type of file is MOST likely to carry phishing malware?",
-        options: [
-          ".jpg",
-          ".docx",
-          ".mp3",
-          ".txt"
-        ],
-        answer: 1
-      },
-      {
-        q: "What’s the best defense against phishing?",
-        options: [
-          "Being skeptical and aware",
-          "Fast clicking",
-          "Trusting everyone",
-          "Avoiding the internet"
-        ],
-        answer: 0
-      }
+    // 5 SETS x 10 QUESTIONS = 50 Total Questions
+    const questionSets = [
+      // SET 1: General Phishing Identification
+      [ 
+        { q: "You receive an email from 'PayPaI' (with a capital I). It asks you to reset your password. Action?", options: ["Reset immediately", "Mark as Spam/Delete", "Reply asking why", "Click link to check"], answer: 1, explanation: "This is a 'Typosquatting' attack. The URL looks real but is misspelled." },
+        { q: "A colleague emails you 'URGENT: Wire transfer needed immediately'. What do you do?", options: ["Send money", "Verify via phone/in-person", "Reply via email", "Ignore it"], answer: 1, explanation: "Urgency is a key indicator of Business Email Compromise (BEC)." },
+        { q: "Which of these domains is likely malicious?", options: ["amazon.com", "amazon-support-security.com", "amazon.co.uk", "aws.amazon.com"], answer: 1, explanation: "Long, hyphenated domains are often used to trick users. Official subdomains look like 'support.amazon.com'." },
+        { q: "You see a lock icon (HTTPS) next to a URL. Does this mean the site is 100% safe?", options: ["Yes, absolutely", "No, phishing sites can use HTTPS too", "Only if it's green", "Yes, if it ends in .com"], answer: 1, explanation: "HTTPS only means the connection is encrypted. A scammer can still encrypt a fake page." },
+        { q: "An email contains an attachment named 'Invoice_JULY.exe'. Should you open it?", options: ["Yes, to check the bill", "No, .exe files are programs", "Yes, if scanned", "Only on mobile"], answer: 1, explanation: "Never open .exe (executable) files from emails. They can install malware instantly." },
+        { q: "What is 'Spear Phishing'?", options: ["Spam sent to everyone", "Targeted attack using your personal info", "Phishing via SMS", "A virus"], answer: 1, explanation: "Spear Phishing is highly personalized, unlike bulk 'spray and pray' spam." },
+        { q: "You hover over a link labeled 'Login' and the preview shows 'http://bit.ly/2s9d8'. Safe?", options: ["Yes", "No, it's hidden/shortened", "Maybe", "Yes, bit.ly is trusted"], answer: 1, explanation: "URL shorteners hide the destination. Treat them as suspicious until verified." },
+        { q: "A pop-up says 'Your computer is infected! Call Microsoft Support'. What is this?", options: ["Real warning", "Tech Support Scam", "Free antivirus", "System update"], answer: 1, explanation: "Microsoft/Apple will never ask you to call a phone number via a pop-up." },
+        { q: "What is the best way to report a phishing email at work?", options: ["Delete it", "Forward to IT/Security Team", "Reply to the sender", "Post it on social media"], answer: 1, explanation: "Always report it so the security team can block the sender for everyone else." },
+        { q: "Generic greetings like 'Dear Customer' are often a sign of:", options: ["Professionalism", "Phishing Mass Campaigns", "VIP treatment", "System error"], answer: 1, explanation: "Legitimate companies usually use your actual name in official correspondence." }
+      ],
+
+      // SET 2: Social Engineering & Smishing
+      [ 
+        { q: "You receive an SMS: 'USPS: Package delivery failed. Click to reschedule'. Action?", options: ["Click the link", "Reply 'STOP'", "Ignore/Block", "Call the number"], answer: 2, explanation: "This is 'Smishing' (SMS Phishing). Scammers exploit delivery notifications constantly." },
+        { q: "A stranger 'finds' a USB drive in the parking lot and gives it to you. Do you:", options: ["Plug it in to find the owner", "Hand it to IT Security", "Format it", "Keep it"], answer: 1, explanation: "This is a 'Baiting' attack. The USB likely contains malware that auto-runs." },
+        { q: "Someone calls claiming to be from your bank's fraud department asking for your PIN.", options: ["Give PIN", "Hang up & call back official number", "Ask for their name", "Complain"], answer: 1, explanation: "Banks NEVER ask for your PIN or password over the phone." },
+        { q: "What is 'Pretexting'?", options: ["Testing code", "Creating a fake scenario to steal info", "Texting before calling", "Emailing"], answer: 1, explanation: "Pretexting involves inventing a scenario (lie) to engage a victim." },
+        { q: "A 'Recruiter' offers you a job on WhatsApp but asks for a registration fee.", options: ["Pay it", "It's a scam", "Negotiate", "Ask for contract"], answer: 1, explanation: "Legitimate jobs never require you to pay money to get hired." },
+        { q: "Why should you limit sharing personal info on social media?", options: ["Save data", "Prevent social engineering", "It's boring", "No reason"], answer: 1, explanation: "Attackers use birthdays, pet names, and locations to guess passwords or answer security questions." },
+        { q: "What is 'Tailgating' in security?", options: ["Driving close", "Following someone into a secure area", "Hacking Wi-Fi", "Email spam"], answer: 1, explanation: "Physical security breach where an unauthorized person follows an authorized one through a door." },
+        { q: "A 'Romance' match asks for money for a plane ticket to visit you.", options: ["Send money", "Report as scam", "Ask for ID", "Video call"], answer: 1, explanation: "Romance scams often involve long-distance stories and urgent money requests." },
+        { q: "Which emotion do social engineers exploit most?", options: ["Happiness", "Fear and Urgency", "Boredom", "Hunger"], answer: 1, explanation: "Fear causes people to bypass critical thinking and act rashly." },
+        { q: "You get a call: 'We detected a virus on your PC'. They ask for remote access.", options: ["Allow access", "Hang up", "Ask for proof", "Pay them"], answer: 1, explanation: "Never grant remote access to cold-callers. This is a classic Tech Support Scam." }
+      ],
+
+      // SET 3: Password Hygiene & Authentication
+      [ 
+        { q: "Which password is the strongest?", options: ["P@ssword1", "Monkey123", "Tr0ub4dor&3", "Blue!Sky#Run$92"], answer: 3, explanation: "Length and randomness are key. The first three are common or follow predictable patterns." },
+        { q: "Why is reusing passwords dangerous?", options: ["It's confusing", "Credential Stuffing attacks", "Takes too long", "It isn't dangerous"], answer: 1, explanation: "If one site is hacked, attackers try that email/password combo on every other site." },
+        { q: "What is MFA (Multi-Factor Authentication)?", options: ["A long password", "Two or more verification steps", "Fingerprint only", "Face ID"], answer: 1, explanation: "MFA requires 'Something you know' (password) AND 'Something you have' (phone/code)." },
+        { q: "Is it safe to store passwords in a browser?", options: ["Yes, always", "No, Password Managers are safer", "Only Chrome", "Only Edge"], answer: 1, explanation: "Dedicated Password Managers offer better encryption and cross-platform security than browsers." },
+        { q: "What is a 'Dictionary Attack'?", options: ["Throwing a book", "Guessing words from a dictionary", "Hacking offline", "Spamming"], answer: 1, explanation: "Automated scripts try every word in the dictionary to crack simple passwords." },
+        { q: "How often should you change your Wi-Fi router's default password?", options: ["Never", "Immediately upon setup", "Every 10 years", "When it breaks"], answer: 1, explanation: "Default passwords (like admin/admin) are public knowledge and must be changed." },
+        { q: "Which is a bad Security Question answer?", options: ["Mother's maiden name", "A fake random word", "A random code", "A fictional place"], answer: 0, explanation: "Mother's maiden name is easily found in public records. Use fake answers instead." },
+        { q: "You receive an MFA code you didn't request. Action?", options: ["Ignore it", "Change password immediately", "Send code to friend", "Post it"], answer: 1, explanation: "This means someone has your password and is trying to login. Change it now!" },
+        { q: "What is 'Salt' in password security?", options: ["Flavor", "Random data added before hashing", "Encryption key", "A virus"], answer: 1, explanation: "Salting ensures that two identical passwords have different hash values in the database." },
+        { q: "Should you share your Netflix password with friends?", options: ["Sure", "No, it increases risk", "Only best friends", "Yes"], answer: 1, explanation: "Sharing passwords expands the attack surface. If their device is infected, your account is compromised." }
+      ],
+
+      // SET 4: Device & Network Security
+      [ 
+        { q: "Is Public Wi-Fi (e.g., at a cafe) safe for banking?", options: ["Yes", "No, data can be intercepted", "Yes if password protected", "Yes on phone"], answer: 1, explanation: "Public Wi-Fi is vulnerable to 'Man-in-the-Middle' attacks. Use a VPN or cellular data." },
+        { q: "What does a VPN (Virtual Private Network) do?", options: ["Speeds up internet", "Encrypts your internet traffic", "Hacks sites", "Stops viruses"], answer: 1, explanation: "VPNs create a secure tunnel, hiding your activity from the network owner." },
+        { q: "Why are software updates important?", options: ["New features only", "They patch security holes", "Make device slower", "Use more data"], answer: 1, explanation: "Updates fix known vulnerabilities (Zero-days) that hackers exploit." },
+        { q: "What is 'Ransomware'?", options: ["Free software", "Malware that locks files for money", "Adware", "Spyware"], answer: 1, explanation: "Ransomware encrypts your data and demands payment (usually crypto) to unlock it." },
+        { q: "What is a 'Keylogger'?", options: ["A diary", "Spyware recording keystrokes", "Password manager", "Login tool"], answer: 1, explanation: "Keyloggers record everything you type, including passwords and credit card numbers." },
+        { q: "Should you leave Bluetooth on when not in use?", options: ["Yes", "No, turn it off", "Doesn't matter", "Only at night"], answer: 1, explanation: "Bluebugging attacks can access your phone via open Bluetooth connections." },
+        { q: "What permissions should a Flashlight app need?", options: ["Contacts & Location", "Camera/Light only", "Microphone", "SMS"], answer: 1, explanation: "Apps asking for irrelevant permissions (like a flashlight wanting contacts) are often spyware." },
+        { q: "What is 'Shoulder Surfing'?", options: ["Swimming", "Looking at someone's screen", "Hacking Wi-Fi", "Emailing"], answer: 1, explanation: "Physical spying—watching someone type their PIN or password in public." },
+        { q: "What is a 'Botnet'?", options: ["Robot network", "Network of infected devices", "Chat bot", "Game server"], answer: 1, explanation: "Hackers control thousands of infected devices ('Zombies') to launch attacks." },
+        { q: "Is 'Incognito Mode' private from your ISP?", options: ["Yes", "No", "Only on Tuesday", "Yes fully"], answer: 1, explanation: "Incognito only deletes local history. Your ISP and the websites can still track you." }
+      ],
+
+      // SET 5: Advanced Threats & mixed
+      [ 
+        { q: "What is a 'Zero-Day' exploit?", options: ["A virus", "A vulnerability known to hackers but not vendors", "Old bug", "Free software"], answer: 1, explanation: "It implies the developers have had 'zero days' to fix it before it was exploited." },
+        { q: "What is the difference between HTTP and HTTPS?", options: ["Speed", "Encryption (Security)", "Price", "Nothing"], answer: 1, explanation: "The 'S' stands for Secure (SSL/TLS encryption)." },
+        { q: "What is 'Adware'?", options: ["Helpful ads", "Malware displaying unwanted ads", "Shopping app", "Browser"], answer: 1, explanation: "Adware bombards you with pop-ups and tracks browsing to sell data." },
+        { q: "You receive an email from your CEO asking for iTunes cards. This is:", options: ["Normal", "Whaling / CEO Fraud", "A bonus", "Spam"], answer: 1, explanation: "Whaling targets high-profile individuals or impersonates them to steal money." },
+        { q: "What is 'Juice Jacking'?", options: ["Stealing juice", "Malware via public USB charging stations", "Hacking power grid", "Overclocking"], answer: 1, explanation: "Public USB charging ports can transfer data. Use a 'Data Blocker' or wall outlet." },
+        { q: "What does a Firewall do?", options: ["Burns viruses", "Filters network traffic", "Speeds up PC", "Deletes files"], answer: 1, explanation: "Firewalls block unauthorized access while allowing legitimate communication." },
+        { q: "What is 'Cryptojacking'?", options: ["Stealing crypto", "Using your PC to mine crypto secretly", "Buying bitcoin", "Encryption"], answer: 1, explanation: "Malware uses your CPU power to mine cryptocurrency for the attacker, slowing your PC." },
+        { q: "Which file extension is a script?", options: [".txt", ".jpg", ".vbs / .py", ".png"], answer: 2, explanation: ".vbs, .py, .js, .bat are script files that can execute code on your machine." },
+        { q: "Is it safe to scan a QR code found on a random wall?", options: ["Yes", "No, Quishing risk", "Always", "Only with iPhone"], answer: 1, explanation: "'Quishing' (QR Phishing) can direct you to malware or fake payment sites." },
+        { q: "What is the 'Dark Web'?", options: ["Night mode", "Encrypted network not indexed by Google", "Bad internet", "Illegal only"], answer: 1, explanation: "An encrypted part of the web (Tor). While used for privacy, it's also a hub for cybercrime." }
+      ]
     ];
 
     const quizForm = document.getElementById("quizForm");
+    let currentQuestions = [];
 
-    questions.forEach((q, i) => {
-      const wrapper = document.createElement('div');
-      wrapper.classList.add('question');
-      wrapper.innerHTML = `
-        <h2>Q${i + 1}: ${q.q}</h2>
-        <div class="options">
-          ${q.options.map((opt, j) => `
-            <label>
-              <input type="radio" name="q${i}" value="${j}" required /> ${opt}
-            </label>
-          `).join('')}
-        </div>
-      `;
-      quizForm.appendChild(wrapper);
-    });
+    // RANDOMIZER LOGIC
+    function initQuiz() {
+      // Pick a random set index (0 to 4)
+      const setIndex = Math.floor(Math.random() * questionSets.length);
+      currentQuestions = questionSets[setIndex];
+      
+      // Update Badge
+      const setNames = ["General Phishing", "Social Engineering", "Password Security", "Device Safety", "Advanced Threats"];
+      document.getElementById("setInfo").innerText = `Topic: ${setNames[setIndex]}`;
+
+      // Render Questions
+      currentQuestions.forEach((q, i) => {
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('question');
+        wrapper.id = `question-${i}`;
+        
+        wrapper.innerHTML = `
+          <h2>Q${i + 1}: ${q.q}</h2>
+          <div class="options">
+            ${q.options.map((opt, j) => `
+              <label id="label-${i}-${j}">
+                <input type="radio" name="q${i}" value="${j}" /> 
+                ${opt}
+              </label>
+            `).join('')}
+          </div>
+          <div class="explanation" id="explain-${i}">
+            <strong>💡 Fact:</strong> ${q.explanation}
+          </div>
+        `;
+        quizForm.appendChild(wrapper);
+      });
+    }
+
+    // Run on load
+    initQuiz();
 
     function submitQuiz() {
       const formData = new FormData(quizForm);
       let score = 0;
-      questions.forEach((q, i) => {
-        if (parseInt(formData.get(`q${i}`)) === q.answer) {
+      let allAnswered = true;
+
+      // Validation
+      for(let i=0; i<currentQuestions.length; i++) {
+        if(!formData.has(`q${i}`)) {
+          allAnswered = false; 
+          break;
+        }
+      }
+      if (!allAnswered) { alert("⚠️ Please answer all questions!"); return; }
+
+      // Grading
+      currentQuestions.forEach((q, i) => {
+        const selected = parseInt(formData.get(`q${i}`));
+        const explanationDiv = document.getElementById(`explain-${i}`);
+        explanationDiv.style.display = 'block';
+        
+        // Lock inputs
+        document.getElementsByName(`q${i}`).forEach(input => input.disabled = true);
+
+        if (selected === q.answer) {
           score++;
+          document.getElementById(`label-${i}-${selected}`).classList.add('correct');
+        } else {
+          if (!isNaN(selected)) document.getElementById(`label-${i}-${selected}`).classList.add('wrong');
+          document.getElementById(`label-${i}-${q.answer}`).classList.add('correct');
         }
       });
-      const result = document.getElementById("result");
-      result.innerHTML = `✅ You scored <strong>${score}</strong> out of <strong>${questions.length}</strong>`;
-    }
 
-    function goBack() {
-      window.location.href = "index.html"; 
+      // Hide Submit, Show Result
+      document.getElementById("submitBtn").style.display = "none";
+      const resultSection = document.getElementById("resultSection");
+      resultSection.style.display = "block";
+
+      // ANIMATE CIRCULAR PROGRESS
+      const percentage = Math.round((score / currentQuestions.length) * 100);
+      const circle = document.getElementById("progressFg");
+      const circumference = 440; // 2 * PI * 70
+
+      const offset = circumference - (percentage / 100) * circumference;
+      
+      setTimeout(() => {
+        circle.style.strokeDashoffset = offset;
+        circle.style.stroke = percentage >= 80 ? "#00ff9c" : (percentage >= 50 ? "#ffff00" : "#ff4444");
+      }, 100);
+
+      document.getElementById("percentageText").innerText = `${percentage}%`;
+      document.getElementById("scoreText").innerHTML = 
+        `You got <strong>${score} / 10</strong> correct.<br>` + 
+        (percentage >= 80 ? "🎉 Excellent! You are cyber-aware." : "⚠️ Review the tips above to stay safe.");
+
+      resultSection.scrollIntoView({ behavior: 'smooth' });
     }
   </script>
 </body>
