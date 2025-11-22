@@ -3,112 +3,92 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hacker Email Detector</title>
+  <title>CyberVenom Email Security</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-
+    /* --- Base Styles --- */
     body {
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      overflow: hidden;
+      margin: 0; padding: 0; height: 100vh; overflow: hidden;
       font-family: 'Share Tech Mono', monospace;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: black;
-      position: relative;
-      z-index: 1;
-      flex-direction: column;
+      background: black; color: #00ff88;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
 
-    canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 0;
-    }
+    canvas { position: absolute; top: 0; left: 0; z-index: 0; }
 
+    /* --- Main Container --- */
     .terminal-box {
-      position: relative;
-      z-index: 2;
-      background-color: #101010cc;
-      border: 1px solid #00ff88;
-      border-radius: 10px;
-      padding: 30px;
-      width: 90%;
-      max-width: 600px;
-      box-shadow: 0 0 20px #00ff88;
-      animation: glow 2s infinite alternate;
-      color: #00ff88;
-      text-align: center;
+      position: relative; z-index: 2;
+      background-color: rgba(16, 16, 16, 0.95);
+      border: 1px solid #00ff88; border-radius: 12px;
+      width: 90%; max-width: 700px;
+      box-shadow: 0 0 25px rgba(0, 255, 136, 0.2);
+      display: flex; flex-direction: column;
+      overflow: hidden; animation: glow 3s infinite alternate;
     }
 
-    @keyframes glow {
-      from { box-shadow: 0 0 10px #00ff88; }
-      to { box-shadow: 0 0 25px #00ff88; }
-    }
+    @keyframes glow { from { box-shadow: 0 0 10px #00ff8840; } to { box-shadow: 0 0 25px #00ff8860; } }
 
-    input {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      margin-bottom: 20px;
-      background: #000;
-      color: #0f0;
-      border: 2px solid #00ff88;
-      border-radius: 5px;
-      font-size: 16px;
-      outline: none;
+    /* --- Tabs --- */
+    .tabs { display: flex; border-bottom: 1px solid #00ff88; background: #002211; }
+    .tab-btn {
+      flex: 1; padding: 15px; background: transparent; border: none;
+      color: #008855; font-family: 'Share Tech Mono', monospace;
+      font-size: 1.1rem; cursor: pointer; transition: 0.3s;
+      border-right: 1px solid #004433;
     }
+    .tab-btn:last-child { border-right: none; }
+    .tab-btn:hover { background: #003322; color: #00ff88; }
+    .tab-btn.active { background: #00ff88; color: black; font-weight: bold; }
 
-    button {
-      padding: 10px 20px;
-      background-color: #00ff88;
-      color: #000;
-      border: none;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      margin: 5px;
+    /* --- Content Sections --- */
+    .panel { padding: 30px; display: none; }
+    .panel.active { display: block; animation: fadeIn 0.5s; }
+
+    h2 { margin-top: 0; text-align: center; text-shadow: 0 0 5px #00ff88; }
+    p { color: #aaa; font-family: 'Poppins', sans-serif; font-size: 0.9rem; text-align: center; margin-bottom: 20px; }
+
+    /* --- Inputs & Buttons --- */
+    input, textarea {
+      width: 100%; padding: 12px; margin-bottom: 15px;
+      background: #000; color: #fff; border: 1px solid #333;
+      border-radius: 5px; font-family: 'Share Tech Mono', monospace; font-size: 1rem;
+      resize: vertical;
     }
+    textarea { min-height: 120px; }
+    input:focus, textarea:focus { border-color: #00ff88; outline: none; }
 
-    button:hover {
-      background-color: #00cc66;
+    .action-btn {
+      width: 100%; padding: 12px; background: #00ff88; color: black;
+      border: none; border-radius: 5px; font-weight: bold; font-size: 1.1rem;
+      cursor: pointer; transition: 0.3s; font-family: 'Share Tech Mono', monospace;
     }
+    .action-btn:hover { background: #00cc66; box-shadow: 0 0 15px #00ff88; }
 
-    .result {
-      margin-top: 10px;
-      font-size: 18px;
-      color: #fff;
+    /* --- Results --- */
+    .result-box {
+      margin-top: 20px; padding: 15px; border-radius: 5px;
+      text-align: center; font-size: 1.1rem; display: none;
     }
+    .result-box.safe { border: 1px solid #00ff88; background: rgba(0, 255, 136, 0.1); color: #00ff88; }
+    .result-box.warn { border: 1px solid #ffff00; background: rgba(255, 255, 0, 0.1); color: #ffff00; }
+    .result-box.danger { border: 1px solid #ff4444; background: rgba(255, 68, 68, 0.1); color: #ff4444; }
 
-    .result.legit { color: #04ff00; }
-    .result.temp { color: #ffe600; }
-    .result.fake { color: #ff4444; }
+    /* --- Scanner Meter --- */
+    .risk-meter-container {
+      width: 100%; height: 10px; background: #333; margin-top: 15px;
+      border-radius: 5px; overflow: hidden; display: none;
+    }
+    .risk-fill { height: 100%; width: 0%; transition: width 1s ease, background 0.5s; }
 
     .back-btn {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      background-color: transparent;
-      border: 2px solid #00ff88;
-      color: #00ff88;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 16px;
-      padding: 10px 18px;
-      border-radius: 6px;
-      cursor: pointer;
-      z-index: 3;
-      transition: all 0.3s ease;
+      position: absolute; bottom: 20px; left: 20px;
+      background: transparent; border: 1px solid #00ff88; color: #00ff88;
+      padding: 8px 15px; cursor: pointer; font-family: 'Share Tech Mono', monospace; z-index: 10;
     }
+    .back-btn:hover { background: #00ff88; color: black; }
 
-    .back-btn:hover {
-      background-color: #00ff88;
-      color: #000;
-      box-shadow: 0 0 10px #00ff88;
-    }
+    @keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
   </style>
 </head>
 <body>
@@ -116,103 +96,168 @@
 <canvas id="matrix"></canvas>
 
 <div class="terminal-box">
-  <h2>👨‍💻 CyberVenom Email Inspector</h2>
-  <input type="email" id="email" placeholder="Enter email to analyze...">
-  <button onclick="checkEmail()">Analyze</button>
-  <div id="result" class="result"></div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('validator')">1. Validate Address</button>
+    <button class="tab-btn" onclick="switchTab('scanner')">2. Scan Content</button>
+  </div>
+
+  <div id="validator" class="panel active">
+    <h2>📧 Domain Inspector</h2>
+    <p>Detect temporary, disposable, or invalid email addresses.</p>
+    
+    <input type="email" id="emailInput" placeholder="Enter sender's email (e.g., support@temp-mail.org)...">
+    <button class="action-btn" onclick="checkEmail()">Verify Domain</button>
+    
+    <div id="validResult" class="result-box"></div>
+  </div>
+
+  <div id="scanner" class="panel">
+    <h2>🛡️ Phishing Content Scanner</h2>
+    <p>Paste the email body text below to check for social engineering triggers.</p>
+    
+    <textarea id="emailBody" placeholder="Paste email content here... (e.g. 'URGENT: Verify your account immediately or it will be suspended')"></textarea>
+    <button class="action-btn" onclick="scanContent()">Analyze Text</button>
+    
+    <div class="risk-meter-container" id="riskMeterBox">
+      <div class="risk-fill" id="riskFill"></div>
+    </div>
+    <div id="scanResult" class="result-box"></div>
+  </div>
 </div>
 
-
-<button class="back-btn" onclick="goBack()">⬅ Back</button>
+<button class="back-btn" onclick="window.location.href='index.html'">⬅ Main Menu</button>
 
 <script>
-  
   const canvas = document.getElementById('matrix');
   const ctx = canvas.getContext('2d');
-
-  canvas.height = window.innerHeight;
-  canvas.width = window.innerWidth;
-
-  const matrixText = "CyberVenom ";
-  const letters = matrixText.split("");
-
-  const fontSize = 18;
-  const columns = canvas.width / fontSize;
-
-  const drops = [];
-  for(let x = 0; x < columns; x++) drops[x] = 1;
-
-  function drawMatrix() {
-    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = "#00ff88";
-    ctx.font = fontSize + "px 'Share Tech Mono'";
-
-    for(let i = 0; i < drops.length; i++) {
-      const text = letters[Math.floor(Math.random() * letters.length)];
-      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-      if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+  function resize(){ canvas.height=window.innerHeight; canvas.width=window.innerWidth; }
+  window.addEventListener('resize', resize); resize();
+  const chars = "10"; const fontSize = 16;
+  let columns = canvas.width/fontSize; let drops=[];
+  function initMatrix(){ columns=canvas.width/fontSize; drops=new Array(Math.floor(columns)).fill(1); }
+  initMatrix();
+  function drawMatrix(){
+    ctx.fillStyle="rgba(0,0,0,0.05)"; ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle="#008855"; ctx.font=`${fontSize}px monospace`;
+    for(let i=0; i<drops.length; i++){
+      ctx.fillText(chars[Math.floor(Math.random()*chars.length)], i*fontSize, drops[i]*fontSize);
+      if(drops[i]*fontSize>canvas.height && Math.random()>0.975) drops[i]=0;
       drops[i]++;
     }
   }
+  setInterval(drawMatrix, 70);
 
-  setInterval(drawMatrix, 83);
-
-  
-  const legitDomains = [
-    "gmail.com", "outlook.com", "mail.yahoo.com", "aol.com", "icloud.com", "protonmail.com",
-    "zoho.com", "mail.com", "gmx.com", "gmx.net", "yandex.ru", "mail.ru", "163.com",
-    "qq.com", "fastmail.com", "hushmail.com", "web.de", "orange.fr", "libero.it", "sapo.pt"
-  ];
-
-  const tempDomains = [
-    "tempmail.com", "10minutemail.com", "mailinator.com", "guerrillamail.com", "dispostable.com",
-    "trashmail.com", "yopmail.com", "temp-mail.org", "getairmail.com", "privatemail.io",
-    "tempmailaddress.com", "throwawaymail.com", "fakeinbox.com", "maildrop.cc", "mytrashmail.com",
-    "tempemail.co", "temp-mail.ru", "nomail.xl.cx", "bouncr.com", "getnada.com", "filter-email.com",
-    "receiveinemail.com", "tempinbox.co.uk", "mytemp.email", "meltmail.com", "tempmailbox.org",
-    "tezmail.com", "fakemail.agency", "mailnesia.com", "spamgourmet.com", "trash-mail.com",
-    "temp-mail.fr", "mailcatch.com", "emailfake.net", "emkei.cz", "temp-mail.ws", "nospam.name",
-    "myfakeemail.me", "temp-mail.cf", "1secmail.com", "fakeemailgenerator.com", "somenotspon.com",
-    "emailondeck.com", "ilovefake.com", "fakemail.net", "mail.td", "tmailor.com", "dispomail.xyz",
-    "mailvn.site", "1secmail.cc", "tempail.com", "tempmail.so", "tempmailo.com", "etempmail.com",
-    "priyo.email", "mail1day.com"
-  ];
-
-  function isValidEmail(email) {
-    const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return pattern.test(email);
+  // --- TAB SWITCHING ---
+  function switchTab(tabName) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    
+    document.getElementById(tabName).classList.add('active');
+    event.target.classList.add('active');
   }
+</script>
+
+<script>
+  const legitDomains = ["gmail.com", "outlook.com", "yahoo.com", "icloud.com", "protonmail.com", "zoho.com", "aol.com"];
+  // Expanded Temp Domain List
+  const tempDomains = [
+    "tempmail.com", "10minutemail.com", "mailinator.com", "guerrillamail.com", "yopmail.com", 
+    "throwawaymail.com", "getnada.com", "maildrop.cc", "temp-mail.org", "sharklasers.com"
+  ];
 
   function checkEmail() {
-    const email = document.getElementById("email").value.trim();
-    const result = document.getElementById("result");
-
-    if (!isValidEmail(email)) {
-      result.textContent = "❌ This is a fake or malformed email address.";
-      result.className = "result fake";
+    const email = document.getElementById("emailInput").value.trim().toLowerCase();
+    const resultBox = document.getElementById("validResult");
+    
+    resultBox.style.display = "block";
+    
+    // 1. Syntax Check (Regex)
+    const syntax = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!syntax.test(email)) {
+      resultBox.className = "result-box danger";
+      resultBox.innerHTML = "❌ <strong>Invalid Format:</strong> Missing '@' or domain extension.";
       return;
     }
 
-    const domain = email.split("@")[1].toLowerCase();
+    const domain = email.split("@")[1];
 
+    // 2. Domain Check
     if (tempDomains.includes(domain)) {
-      result.textContent = `⚠️ Temporary or disposable email detected: ${domain}`;
-      result.className = "result temp";
+      resultBox.className = "result-box danger";
+      resultBox.innerHTML = `⚠️ <strong>High Risk:</strong> '${domain}' is a known disposable/temporary provider.`;
     } else if (legitDomains.includes(domain)) {
-      result.textContent = `✅ Legit email detected: ${email}`;
-      result.className = "result legit";
+      resultBox.className = "result-box safe";
+      resultBox.innerHTML = `✅ <strong>Legit Domain:</strong> '${domain}' is a verified provider.`;
     } else {
-      result.textContent = `⚠️ Temporary or unrecognized email domain: ${domain}`;
-      result.className = "result fake";
+      resultBox.className = "result-box warn";
+      resultBox.innerHTML = `⚠️ <strong>Unknown Domain:</strong> '${domain}' is not in our white/blacklist. Proceed with caution.`;
     }
   }
+</script>
 
-  
-  function goBack() {
-    window.location.href = "index.html"; 
+<script>
+  function scanContent() {
+    const text = document.getElementById("emailBody").value.toLowerCase();
+    const resultBox = document.getElementById("scanResult");
+    const meterBox = document.getElementById("riskMeterBox");
+    const meterFill = document.getElementById("riskFill");
+    
+    if(text.length < 10) {
+      alert("Please paste more text for analysis.");
+      return;
+    }
+
+    // Heuristic Keywords (Trigger words)
+    const triggers = {
+      high: ["password", "bank account", "social security", "ssn", "credit card", "wire transfer", "bitcoin", "urgent action"],
+      medium: ["verify", "suspended", "locked", "immediately", "click here", "login", "update payment", "invoice", "irs"],
+      low: ["dear customer", "kindly", "gift", "winner", "prize", "offer"]
+    };
+
+    let riskScore = 0;
+    let foundTriggers = [];
+
+    // Analyze Text
+    triggers.high.forEach(w => { if(text.includes(w)) { riskScore += 3; foundTriggers.push(w); } });
+    triggers.medium.forEach(w => { if(text.includes(w)) { riskScore += 2; foundTriggers.push(w); } });
+    triggers.low.forEach(w => { if(text.includes(w)) { riskScore += 1; foundTriggers.push(w); } });
+
+    // Normalize Score (Cap at 10 for percentage)
+    if(riskScore > 10) riskScore = 10;
+    const percentage = riskScore * 10;
+
+    // Display Results
+    resultBox.style.display = "block";
+    meterBox.style.display = "block";
+    
+    // Animate Meter
+    setTimeout(() => { meterFill.style.width = percentage + "%"; }, 100);
+
+    if (riskScore >= 7) {
+      meterFill.style.background = "#ff4444";
+      resultBox.className = "result-box danger";
+      resultBox.innerHTML = `
+        🚨 <strong>PHISHING DETECTED</strong><br>
+        Risk Level: HIGH (${percentage}%)<br>
+        <span style="font-size:0.8rem">Triggers found: ${foundTriggers.join(", ")}</span>
+      `;
+    } else if (riskScore >= 3) {
+      meterFill.style.background = "#ffff00";
+      resultBox.className = "result-box warn";
+      resultBox.innerHTML = `
+        ⚠️ <strong>SUSPICIOUS CONTENT</strong><br>
+        Risk Level: MEDIUM (${percentage}%)<br>
+        <span style="font-size:0.8rem">Triggers found: ${foundTriggers.join(", ")}</span>
+      `;
+    } else {
+      meterFill.style.background = "#00ff88";
+      resultBox.className = "result-box safe";
+      resultBox.innerHTML = `
+        ✅ <strong>LOOKS SAFE</strong><br>
+        Risk Level: LOW (${percentage}%)<br>
+        No major phishing triggers detected.
+      `;
+    }
   }
 </script>
 
