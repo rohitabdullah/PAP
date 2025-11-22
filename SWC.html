@@ -3,164 +3,275 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CyberVenom Scam Website Checker</title>
+  <title>CyberVenom Scam Scanner</title>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Orbitron:wght@500&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    /* --- Base Styles --- */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background: #000;
-      color: #00ff9c;
-      font-family: 'Fira Code', monospace;
-      overflow: hidden;
-    }
-
-    canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: -1;
-    }
-
-    .container {
-      position: relative;
+      background: #000; color: #00ff9c; font-family: 'Fira Code', monospace;
+      overflow: hidden; display: flex; align-items: center; justify-content: center;
       height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 2rem;
+    }
+
+    canvas { position: fixed; top: 0; left: 0; z-index: -1; }
+
+    /* --- Main Interface --- */
+    .container {
+      position: relative; z-index: 10;
+      width: 90%; max-width: 800px;
+      background: rgba(10, 10, 10, 0.95);
+      border: 1px solid #00ff9c; border-radius: 10px;
+      padding: 2rem; box-shadow: 0 0 30px rgba(0, 255, 156, 0.2);
+      display: flex; flex-direction: column; gap: 1.5rem;
     }
 
     h1 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2.8rem;
-      color: #00ff9c;
-      text-shadow: 0 0 15px #00ff9c;
+      font-family: 'Orbitron', sans-serif; text-align: center;
+      font-size: 2rem; text-shadow: 0 0 10px #00ff9c; margin-bottom: 1rem;
     }
 
-    .input-area {
-      margin-top: 2rem;
-      display: flex;
-      gap: 1rem;
-      flex-direction: column;
-      width: 100%;
-      max-width: 600px;
-    }
-
+    /* --- Input Area --- */
+    .input-group { display: flex; gap: 10px; position: relative; }
+    
     input[type="text"] {
-      padding: 1rem;
-      font-size: 1rem;
-      border-radius: 8px;
-      border: 1px solid #00ff9c;
-      background-color: #111;
-      color: #0f0;
-      box-shadow: 0 0 10px #00ff9c50;
-      outline: none;
+      flex: 1; padding: 15px; background: #000; border: 1px solid #333;
+      color: #fff; font-family: 'Fira Code', monospace; font-size: 1.1rem;
+      border-radius: 5px; outline: none; transition: 0.3s;
     }
+    input[type="text"]:focus { border-color: #00ff9c; box-shadow: 0 0 10px rgba(0, 255, 156, 0.3); }
 
     button {
-      padding: 1rem;
-      font-size: 1.1rem;
-      font-family: 'Fira Code', monospace;
-      background: #00ff9c;
-      color: #000;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 20px #00ff9c;
+      padding: 0 25px; background: #00ff9c; color: #000; border: none;
+      font-family: 'Fira Code', monospace; font-weight: bold; font-size: 1.1rem;
+      cursor: pointer; border-radius: 5px; transition: 0.2s;
     }
+    button:hover { background: #00cc7a; transform: scale(1.05); }
+    button:disabled { background: #333; color: #666; cursor: not-allowed; transform: none; }
 
-    button:hover {
-      background: #0f0;
-      transform: scale(1.05);
-      box-shadow: 0 0 30px #00ff9c;
+    /* --- Terminal Output --- */
+    .terminal-window {
+      background: #000; border: 1px solid #333; border-radius: 5px;
+      height: 300px; padding: 15px; overflow-y: auto;
+      font-size: 0.9rem; color: #ccc; display: none; /* Hidden initially */
     }
+    
+    .log-line { margin-bottom: 5px; display: block; }
+    .log-line.info { color: #00aaff; }
+    .log-line.success { color: #00ff9c; }
+    .log-line.warning { color: #ffff00; }
+    .log-line.danger { color: #ff4444; font-weight: bold; }
 
-    .result {
-      margin-top: 2rem;
-      font-size: 1.3rem;
-      color: #ffff00;
-      text-shadow: 0 0 10px #ffff00;
+    /* --- Final Report Card --- */
+    .report-card {
+      border-top: 2px solid #333; margin-top: 10px; padding-top: 10px;
+      display: none; animation: slideUp 0.5s ease;
     }
+    
+    .verdict { font-size: 1.5rem; text-align: center; margin-bottom: 15px; }
+    .verdict.safe { color: #00ff9c; text-shadow: 0 0 10px #00ff9c; }
+    .verdict.risk { color: #ff4444; text-shadow: 0 0 10px #ff4444; }
+
+    .detail-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+      font-size: 0.9rem; color: #aaa;
+    }
+    .detail-item span { color: #fff; font-weight: bold; }
+
+    @keyframes slideUp { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
 
     .back-btn {
-      position: absolute;
-      top: 1rem;
-      left: 1rem;
-      font-size: 1rem;
-      color: #0f0;
-      background: none;
-      border: none;
-      cursor: pointer;
-      text-decoration: underline;
+      position: absolute; top: -50px; left: 0;
+      background: transparent; color: #00ff9c; border: 1px solid #00ff9c;
+      padding: 8px 15px; font-size: 0.9rem;
     }
+    .back-btn:hover { background: #00ff9c; color: #000; }
 
-    .back-btn:hover {
-      color: #ff0;
-    }
+    /* Custom Scrollbar */
+    .terminal-window::-webkit-scrollbar { width: 8px; }
+    .terminal-window::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
   </style>
 </head>
 <body>
+
   <canvas id="matrix"></canvas>
+
   <div class="container">
-    <button class="back-btn" onclick="window.location.href='index.html'">⬅ Back</button>
-    <h1>🕵️‍♂️ CyberVenom Scam Website Checker</h1>
-    <div class="input-area">
-      <input type="text" id="urlInput" placeholder="Enter a URL to check (e.g. https://example.com)" />
-      <button onclick="checkURL()">🔍 Check Now</button>
+    <button class="back-btn" onclick="window.location.href='index.html'">⬅ Main Menu</button>
+    
+    <h1>🕵️‍♂️ CyberVenom Scanner</h1>
+    
+    <div class="input-group">
+      <input type="text" id="urlInput" placeholder="Enter URL (e.g. http://login-apple-id.com)" />
+      <button id="scanBtn" onclick="startScan()">SCAN TARGET</button>
     </div>
-    <div class="result" id="resultBox"></div>
+
+    <div class="terminal-window" id="terminal">
+      <div id="scanLogs"></div>
+      
+      <div class="report-card" id="finalReport">
+        <div class="verdict" id="verdictText"></div>
+        <div class="detail-grid">
+          <div class="detail-item">Protocol: <span id="resProtocol"></span></div>
+          <div class="detail-item">TLD Risk: <span id="resTLD"></span></div>
+          <div class="detail-item">Database: <span id="resDB"></span></div>
+          <div class="detail-item">IP Check: <span id="resIP"></span></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
+    // --- Matrix Background (Unchanged) ---
     const canvas = document.getElementById('matrix');
     const ctx = canvas.getContext('2d');
-    canvas.height = window.innerHeight;
-    canvas.width = window.innerWidth;
-    let letters = Array(256).join(1).split('');
+    function resize(){ canvas.height=window.innerHeight; canvas.width=window.innerWidth; }
+    window.addEventListener('resize', resize); resize();
+    const letters = Array(256).join(1).split('');
     const draw = () => {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = '#0f0';
       letters.map((y, index) => {
         const text = String.fromCharCode(3e4 + Math.random() * 33);
-        const x = index * 10;
-        ctx.fillText(text, x, y);
+        ctx.fillText(text, index * 10, y);
         letters[index] = y > 758 + Math.random() * 1e4 ? 0 : y + 10;
       });
     };
     setInterval(draw, 33);
 
-    function checkURL() {
-      const url = document.getElementById('urlInput').value.trim();
-      const resultBox = document.getElementById('resultBox');
+    // --- MOCK DATABASE (Blacklist) ---
+    const blacklist = [
+      "faceb00k.com", "paypa1.com", "apple-secure-login.com", "free-netflix-pass.net",
+      "google-security-update.xyz", "amazon-order-confirm.top", "wellsfargo-verify.cc"
+    ];
 
-      if (!url) {
-        resultBox.innerHTML = '❌ Please enter a valid URL!';
-        return;
+    // --- SCANNED LOGIC ---
+    async function startScan() {
+      const urlInput = document.getElementById('urlInput').value.trim();
+      const terminal = document.getElementById('terminal');
+      const logs = document.getElementById('scanLogs');
+      const report = document.getElementById('finalReport');
+      const btn = document.getElementById('scanBtn');
+
+      if (!urlInput) { alert("Please enter a URL!"); return; }
+
+      // Reset UI
+      terminal.style.display = 'block';
+      logs.innerHTML = '';
+      report.style.display = 'none';
+      btn.disabled = true;
+      btn.innerText = "SCANNING...";
+
+      // Helper to add log with delay
+      const addLog = (msg, type="info") => {
+        const div = document.createElement('span');
+        div.className = `log-line ${type}`;
+        div.innerText = `> ${msg}`;
+        logs.appendChild(div);
+        terminal.scrollTop = terminal.scrollHeight; // Auto-scroll
+      };
+
+      try {
+        // PHASE 1: Parsing
+        addLog("Initializing scanner module...", "info");
+        await new Promise(r => setTimeout(r, 600));
+        
+        let domain = "";
+        let protocol = "http";
+        
+        // Simple parser
+        try {
+          // Add http if missing to make URL constructor work
+          const tempUrl = urlInput.startsWith('http') ? urlInput : `http://${urlInput}`;
+          const urlObj = new URL(tempUrl);
+          domain = urlObj.hostname;
+          protocol = urlObj.protocol.replace(':', '');
+          addLog(`Target Resolved: ${domain}`, "success");
+        } catch (e) {
+          addLog("Error: Invalid URL format.", "danger");
+          btn.disabled = false; btn.innerText = "SCAN TARGET";
+          return;
+        }
+
+        // PHASE 2: Protocol Check
+        await new Promise(r => setTimeout(r, 800));
+        if (protocol === 'https') {
+          addLog("SSL/TLS Certificate: Present", "success");
+        } else {
+          addLog("SSL/TLS Certificate: MISSING (Insecure Connection)", "danger");
+        }
+
+        // PHASE 3: Blacklist Query
+        await new Promise(r => setTimeout(r, 800));
+        addLog("Querying Global Threat Database...", "info");
+        
+        let isBlacklisted = blacklist.some(b => domain.includes(b));
+        if(isBlacklisted) {
+          addLog(`MATCH FOUND: ${domain} is in Blacklist!`, "danger");
+        } else {
+          addLog("No matches in static blacklist.", "success");
+        }
+
+        // PHASE 4: Heuristic Analysis
+        await new Promise(r => setTimeout(r, 800));
+        addLog("Running Heuristic Analysis...", "info");
+        
+        let riskScore = 0;
+        let riskFactors = [];
+
+        // Check 1: Protocol
+        if (protocol !== 'https') { riskScore += 3; riskFactors.push("Insecure HTTP"); }
+        
+        // Check 2: Suspicious TLDs
+        const susTLDs = ['.xyz', '.top', '.ru', '.cn', '.cc', '.tk'];
+        if (susTLDs.some(t => domain.endsWith(t))) { riskScore += 2; riskFactors.push("High-Risk TLD"); }
+
+        // Check 3: IP Address usage
+        const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+        if (ipRegex.test(domain)) { riskScore += 4; riskFactors.push("Raw IP Host"); }
+
+        // Check 4: Keywords
+        if (urlInput.includes("verify") || urlInput.includes("login") || urlInput.includes("update")) {
+          // If it's not a major site, these keywords are sus
+          if (!domain.includes("google") && !domain.includes("apple") && !domain.includes("amazon")) {
+            riskScore += 2; riskFactors.push("Suspicious Keywords");
+          }
+        }
+
+        if (isBlacklisted) riskScore += 10; // Instant fail
+
+        // FINAL VERDICT
+        await new Promise(r => setTimeout(r, 500));
+        logs.innerHTML += "<br>----------------------------------------<br>";
+        
+        report.style.display = 'block';
+        
+        // Update Report Details
+        document.getElementById('resProtocol').innerText = protocol.toUpperCase();
+        document.getElementById('resTLD').innerText = susTLDs.some(t => domain.endsWith(t)) ? "Suspicious" : "Standard";
+        document.getElementById('resDB').innerText = isBlacklisted ? "MATCHED" : "Clean";
+        document.getElementById('resIP').innerText = ipRegex.test(domain) ? "DETECTED" : "None";
+
+        const verdictTxt = document.getElementById('verdictText');
+        
+        if (riskScore >= 4) {
+          verdictTxt.innerHTML = "⚠️ THREAT DETECTED";
+          verdictTxt.className = "verdict risk";
+          addLog("CONCLUSION: High probability of phishing.", "danger");
+        } else {
+          verdictTxt.innerHTML = "✅ SAFE TO BROWSE";
+          verdictTxt.className = "verdict safe";
+          addLog("CONCLUSION: No threats found.", "success");
+        }
+
+      } catch (err) {
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "SCAN TARGET";
+        // Scroll to bottom
+        terminal.scrollTop = terminal.scrollHeight;
       }
-
-      const suspiciousPatterns = [
-        /free\w{2,10}\./i,
-        /\d{3,}\./,
-        /(bit\.ly|tinyurl\.com|rebrand\.ly|t\.co)/i,
-        /login\.(\w{2,10}\.)?\w+\.(?!com|net|org)/i,
-        /@|\s|http.*http/i,
-        /(account|verify|secure|update)[\w\-]*\.(?!com)/i
-      ];
-
-      let isScam = suspiciousPatterns.some(pattern => pattern.test(url));
-
-      resultBox.innerHTML = isScam
-        ? '⚠️ This URL looks suspicious and might be a SCAM!'
-        : '✅ This URL looks safe (but always double check!).';
     }
   </script>
 </body>
